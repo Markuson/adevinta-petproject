@@ -4,14 +4,23 @@ export default class  HTTPMovieRepository extends MovieRepository {
     constructor({ fetcher, config }) {
         this._fetcher = fetcher
         this._config = config
+        this._MovieListValueObjectFactory = movieListValueObjectFactory
     }
 
-    search({ keyword }) {
+    async search({ keyword }) {
         const API_HOST = this._config.get('API_HOST')
         const API_KEY = this._config.get('API_KEY')
 
-        const response = await this._fetcher.get(
+        const { data } = await this._fetcher.get(
             `${API_HOST}/search/movie?api_key=${API_KEY}&query=${keyword}`
         )
+
+        const { results } = data
+
+        const movieListValueObject = this._MovieListValueObjectFactory({
+            list: results
+        })
+
+        return movieListValueObject
     }
 }
